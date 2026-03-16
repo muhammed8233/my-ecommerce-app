@@ -15,8 +15,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -42,6 +40,8 @@ public class User extends Audit implements UserDetails{
     @NotBlank(message = "password must not be empty")
     @Size(min = 4, message = "password size must not be < 4")
     private String password;
+
+    @Builder.Default
     private boolean isEnabled = false;
 
     @NotNull
@@ -100,4 +100,5 @@ public class User extends Audit implements UserDetails{
     public boolean isEnabled() {
         return this.isEnabled;
     }
+
 }

@@ -1,14 +1,19 @@
 package com.example.ecommerce.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.ecommerce.dtos.AuthenticationRequestDto;
 import com.example.ecommerce.dtos.AuthenticationResponseDto;
-import com.example.ecommerce.service.AuthenticationService;
 import com.example.ecommerce.dtos.RegisterRequestDto;
+import com.example.ecommerce.service.AuthenticationService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "api/v1/auth")

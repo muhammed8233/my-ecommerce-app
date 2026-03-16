@@ -1,9 +1,10 @@
 package com.example.ecommerce.exception;
 
-import com.mongodb.MongoCommandException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
-import jakarta.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,10 +15,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.mongodb.MongoCommandException;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -60,9 +62,11 @@ public class GlobalExceptionHandler {
     private ResponseEntity<Map<String, Object>> buildValidationResponse(ConstraintViolationException ex) {
         Map<String, String> fieldErrors = new LinkedHashMap<>();
         ex.getConstraintViolations().forEach(violation -> {
-            String fieldName = violation.getPropertyPath().toString();
-            String shortFieldName = fieldName.substring(fieldName.lastIndexOf('.') + 1);
-            fieldErrors.put(shortFieldName, violation.getMessage());
+            String fieldName = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : "";
+            int dotIndex = fieldName.lastIndexOf('.');
+            String shortFieldName = dotIndex >= 0 ? fieldName.substring(dotIndex + 1) : fieldName;
+            fieldErrors.put(shortFieldName.isEmpty() ? "field" : shortFieldName,
+                    violation.getMessage() != null ? violation.getMessage() : "invalid value");
         });
 
         Map<String, Object> body = new LinkedHashMap<>();
@@ -86,9 +90,11 @@ public class GlobalExceptionHandler {
         }
         else if (ex.getClass().isAnnotationPresent(ResponseStatus.class)) {
             status = ex.getClass().getAnnotation(ResponseStatus.class).value();
+        } else {
         }
 
-        return buildErrorResponse(status != null ? status : HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        String message = ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred";
+        return buildErrorResponse(status != null ? status : HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 
 
