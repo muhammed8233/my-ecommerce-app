@@ -1,0 +1,5 @@
+com\example\ecommerce\serviceTest\AuthenticationServiceImplTest.class
+com\example\ecommerce\serviceTest\ProductServiceImplTest.class
+com\example\ecommerce\serviceTest\InventoryMovementServiceImplTest.class
+com\example\ecommerce\EcommerceApplicationTests.class
+com\example\ecommerce\serviceTest\OrderServiceImplTest.class
