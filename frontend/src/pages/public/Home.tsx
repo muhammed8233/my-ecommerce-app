@@ -51,7 +51,7 @@ const HomePage: React.FC = () => {
               {/* Product Image Container */}
               <div className="relative aspect-square overflow-hidden bg-gray-100">
                 <img 
-                  src={product.imageUrl || 'https://via.placeholder.com'} 
+                  src={product.imageUrl || 'https://placehold.co'} 
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -61,6 +61,13 @@ const HomePage: React.FC = () => {
                   </span>
                 )}
               </div>
+              {product.stockQuantity === 0 && (
+                <div className="absolute inset-0 bg-white/60 flex items-center justify-center backdrop-blur-[1px]">
+                  <span className="bg-black text-white text-xs px-3 py-1 rounded-full font-bold uppercase tracking-widest">
+                    Sold Out
+                  </span>
+                </div>
+              )}
 
               {/* Product Info */}
               <div className="p-4">

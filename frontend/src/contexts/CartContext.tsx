@@ -10,6 +10,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return storage.get<CartItem[]>('cart') || [];
   });
 
+  const totalAmount = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+
   // Use storage utility for persistence
   useEffect(() => {
     storage.set('cart', cartItems);
@@ -53,7 +58,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart }}>
+    <CartContext.Provider value={{ cartItems, addToCart, totalAmount, removeFromCart, updateQuantity, clearCart }}>
       {children}
     </CartContext.Provider>
   );

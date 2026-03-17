@@ -10,37 +10,34 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-   const fetchProducts = async () => {
+  const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/products'); 
+      const response = await fetch('/api/v1/products');
       const data = await response.json();
 
-      /** 
-       * NOTE: If your backend returns a direct array, use 'data'.
-       * If it wraps it like DummyJSON, use 'data.products'.
-       */
-      const sourceData = Array.isArray(data) ? data : data.products;
+      // Spring Data Pageable wraps the list in a "content" field
+      // Fallback to [] if data or data.content is missing
+      const sourceData = data?.content || [];
 
-      const formatted: Product[] = sourceData.map((p: any) => ({
-        id: p.id.toString(),
-        name: p.string || p.name, // Handles both DummyJSON and standard naming
-        price: p.price,
-        category: p.category,
-        imageUrl: p.string || p.imageUrl,
-        stockQuantity: p.number || p.stockQuantity
+      const formatted = sourceData.map((p: any) => ({
+        id: p.id?.toString() || Math.random().toString(),
+        name: p.productName || p.name || "Unknown", // Controller uses productName sort key
+        price: p.price || 0,
+        category: p.category || "General",
+        imageUrl: p.imageUrl || "",
+        stockQuantity: p.stockQuantity || 0
       }));
 
       setProducts(formatted);
     } catch (error) {
-      console.error("Failed to fetch products", error);
+      console.error("Fetch error:", error);
+      setProducts([]); // Prevents UI crash if backend fails
     } finally {
       setLoading(false);
     }
   };
-
-
-
+  
   useEffect(() => {
     fetchProducts();
   }, []);

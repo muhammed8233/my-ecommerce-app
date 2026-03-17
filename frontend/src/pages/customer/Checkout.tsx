@@ -29,7 +29,10 @@ const CheckoutPage: React.FC = () => {
       }));
 
       // 3. Create the Order in Spring Boot
-      const newOrder = await orderService.createOrder(user.id, items);
+      const newOrder = await orderService.createOrder({
+        customerId: user.id,
+        items: items
+      });
 
       // 4. Trigger Mock Payment using the new Order ID
       const payment = await orderService.payOrder(newOrder.id);

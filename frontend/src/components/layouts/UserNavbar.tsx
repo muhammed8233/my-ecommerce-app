@@ -14,9 +14,9 @@ const Navbar = () => {
         <Link to="/" className="hover:text-blue-500">Home</Link>
         
         {/* Customer Specific Links */}
-        {user?.role === 'CUSTOMER' && (
+        {user?.role === 'USER' && (
           <>
-            <Link to="/customer/cart" className="relative">
+            <Link to="/cart" className="relative">
               Cart
               {cartItems.length > 0 && (
                 <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full px-1">
@@ -24,7 +24,7 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-            <Link to="/customer/orders">My Orders</Link>
+            <Link to="/orders">My Orders</Link>
           </>
         )}
 

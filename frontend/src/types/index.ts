@@ -28,7 +28,7 @@ export interface Order {
 }
 
 // 3. Authentication & User
-export type Role = 'ADMIN' | 'CUSTOMER';
+export type Role = 'ADMIN' | 'USER';
 
 export interface User {
   id: string;
@@ -66,6 +66,8 @@ export interface AuthContextType {
   logout: () => void;
   register: (formData: any) => Promise<any>;
   isAdmin: boolean;
+  resendToken: (email: string) => Promise<any>; // Add this
+  verifyToken: (email: string, token: string) => Promise<any>;
 }
 
 export interface CartContextType {
@@ -74,6 +76,7 @@ export interface CartContextType {
   removeFromCart: (id: string) => void; // CHANGED to string
   updateQuantity: (id: string, delta: number) => void; // CHANGED to string
   clearCart: () => void;
+  totalAmount: number;
 }
 
 export interface ProductContextType {

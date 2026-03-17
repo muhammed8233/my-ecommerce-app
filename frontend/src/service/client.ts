@@ -9,11 +9,18 @@ const client = axios.create({
 
 client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('token');
-  if (token && config.headers) {
+  
+  // Skip adding token for registration, verification, or resend endpoints
+  const isAuthRoute = config.url?.includes('/auth/register') || 
+                      config.url?.includes('/auth/verify') || 
+                      config.url?.includes('/auth/resend');
+
+  if (token && config.headers && !isAuthRoute) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
 
 client.interceptors.response.use(
   (response) => response,

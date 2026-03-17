@@ -11,41 +11,39 @@ const AuthPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // REARRANGED: Modern Form Action instead of handleSubmit
-  const handleAuth = async (formData: FormData) => {
-    setLoading(true);
-    setError(null);
+const handleAuth = async (formData: FormData) => {
+  setLoading(true);
+  setError(null);
 
-    // Pulling data directly from form fields via their 'name' attribute
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const name = formData.get('name') as string;
+  const email = (formData.get('email') as string).toLowerCase().trim();
+  const password = formData.get('password') as string;
+  const name = formData.get('name') as string;
 
-    try {
-      if (isLogin) {
-        // Mock Login Mapping
-        await login({ 
-          username: email === 'admin@test.com' ? 'emilys' : email, 
-          password 
-        });
-      } else {
-        // Mock Register
-        await register({ name, email, password });
-        alert("Registration successful! (Mock Mode)");
-        setIsLogin(true);
-        setLoading(false);
-        return; 
-      }
+  try {
+    if (isLogin) {
+      // Real Login: AuthProvider handles the /api/v1/auth/login call
+      await login({ email, password });
       
       const from = (location.state as any)?.from?.pathname || "/";
       navigate(from, { replace: true });
+    } else {
+      // Real Register: Hits /api/v1/auth/register
+      await register({ name, email, password });
       
-    } catch (err: any) {
-      setError("Invalid credentials. Try: emilys / emilyspass");
-    } finally {
-      setLoading(false);
+      // REDIRECT TO VERIFY: Send them to enter the 4-digit code
+      navigate(`/verify?email=${encodeURIComponent(email)}`, { 
+        state: { email }, 
+        replace: true 
+      });
     }
-  };
+  } catch (err: any) {
+    // Show the actual error from Spring Boot (e.g., "User already exists" or "Verify your account")
+    setError(err.message || "An error occurred. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 px-4">

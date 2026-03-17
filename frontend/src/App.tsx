@@ -23,6 +23,7 @@ import PaymentStatus from './pages/customer/PaymentStatus';
 import Dashboard from './pages/admin/Dashboard';
 import ProductManagement from './pages/admin/ProductManagement';
 import InventoryLog from './components/inventory/InventoryLog';
+import VerifyPage from './pages/public/Verify';
 
 // --- PROTECTED ROUTE COMPONENT ---
 const ProtectedRoute = ({ children, adminOnly = false }: { children: JSX.Element, adminOnly?: boolean }) => {
@@ -41,6 +42,7 @@ const App: React.FC = () => {
       {/* 1. AUTH ROUTES (No Navbar/Footer for a clean login look) */}
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<AuthPage />} />
+      <Route path="/verify" element={<VerifyPage />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* 2. PUBLIC & CUSTOMER ROUTES (With Navbar) */}

@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           id: data.email,
           name: data.name,
           email: data.email,
-          role: data.role || 'CUSTOMER',
+          role: data.role || 'USER',
           token: data.token
         };
         setUser(loggedInUser);
@@ -67,6 +67,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
   };
+
+    // For Resend Token
+  const resendToken = async (email: string) => {
+    // Second argument is data (empty {}), third is config (params)
+    return await client.post('/auth/resend-token', {}, { 
+      params: { email } 
+    });
+  };
+
+  // For Verify Token
+  const verifyToken = async (email: string, token: string) => {
+    return await client.post('/auth/verify-token', {}, { 
+      params: { email, token } 
+    });
+  };
+
 
   const logout = () => {
     setUser(null);
@@ -81,7 +97,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       register, // Add this
       logout, 
       loading,
-      isAdmin: user?.role === 'ADMIN' // Useful helper for your ProtectedRoute
+      isAdmin: user?.role === 'ADMIN', // Useful helper for your ProtectedRoute
+      resendToken ,
+      verifyToken,
     }}>
       {children}
     </AuthContext.Provider>
