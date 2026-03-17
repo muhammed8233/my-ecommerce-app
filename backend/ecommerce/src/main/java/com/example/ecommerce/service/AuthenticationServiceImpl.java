@@ -26,22 +26,46 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final TokenService tokenService;
 
 
+    // AuthenticationServiceImpl.java
+
     @Override
     public AuthenticationResponseDto register(RegisterRequestDto request) {
-        RegisterRequestDto user = RegisterRequestDto
-                .builder()
+        // 1. Create and Save the user (it should be disabled by default in your UserService)
+        RegisterRequestDto userDto = RegisterRequestDto.builder()
                 .name(request.getName())
-                .email(request.getEmail())
+                .email(request.getEmail().toLowerCase().trim())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
-        User saved = userService.saveUser(user);
+        User saved = userService.saveUser(userDto);
 
+        // 2. Generate and Save the 4-digit verification token
+        String verificationToken = String.valueOf(new java.security.SecureRandom().nextInt(9000) + 1000);
+        Token token = Token.builder()
+                .token(verificationToken)
+                .userId(saved.getId())
+                .createdAt(LocalDateTime.now())
+                .build();
+        tokenService.saveToken(token);
+
+        // 3. Send the email (Wrap in try-catch to ensure JWT is still returned if mail fails)
+        try {
+            emailService.sendVerificationEmail(saved.getEmail(), verificationToken);
+        } catch (Exception e) {
+            // Log the error, but don't stop the flow; user can "Resend" on the verify page
+            System.err.println("Failed to send email: " + e.getMessage());
+        }
+
+        // 4. Generate JWT immediately so they are "Authorized"
         String jwtToken = jwtService.generateToken(saved);
-        return AuthenticationResponseDto
-                .builder()
+
+        return AuthenticationResponseDto.builder()
                 .token(jwtToken)
+                .name(saved.getName())
+                .email(saved.getEmail())
+                .role(saved.getRole())
                 .build();
     }
+
 
     @Override
     public ResponseEntity<String> verifyUser(String email, String token) {

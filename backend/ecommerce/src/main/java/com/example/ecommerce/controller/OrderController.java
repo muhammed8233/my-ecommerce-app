@@ -23,7 +23,7 @@ import com.example.ecommerce.service.OrderService;
 
 
 @RestController
-@RequestMapping(path = "api/v1/orders")
+@RequestMapping(path = "/api/v1/orders")
 public class OrderController {
    @Autowired
    private OrderService orderService;

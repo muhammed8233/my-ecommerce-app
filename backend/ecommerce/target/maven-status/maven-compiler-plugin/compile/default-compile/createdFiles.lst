@@ -1,5 +1,4 @@
 com\example\ecommerce\controller\AuthenticationController.class
-com\example\ecommerce\Enum\Status.class
 com\example\ecommerce\model\User.class
 com\example\ecommerce\model\Payment$PaymentBuilder.class
 com\example\ecommerce\dtos\OrderResponseDto.class
