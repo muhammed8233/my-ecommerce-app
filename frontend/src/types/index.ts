@@ -53,6 +53,11 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+export interface ProtectedRouteProps {
+  children: React.ReactNode;
+  allowedRoles: string[];
+}
+
 // 6. Context Interfaces (Contracts)
 export interface AuthContextType {
   user: User | null;
