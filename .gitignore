@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+# Ignore test properties
+backend/ecommerce/src/test/resources/application-test.properties
+
 
 # Editor directories and files
 .vscode/*
