@@ -62,9 +62,9 @@ export interface ProtectedRouteProps {
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (credentials: any) => Promise<void>;
+  login: (credentials: any) => Promise<any>;
   logout: () => void;
-  register: (formData: any) => Promise<void>;
+  register: (formData: any) => Promise<any>;
   isAdmin: boolean;
 }
 
@@ -80,4 +80,10 @@ export interface ProductContextType {
   products: Product[];
   loading: boolean;
   refreshProducts: () => Promise<void>;
+}
+
+export interface OrderContextType {
+  orders: Order[];
+  fetchOrders: () => Promise<void>;
+  loading: boolean;
 }

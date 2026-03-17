@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, type ReactNode } from 'react';
 import  { storage } from '../utils/storage';
 import type { User, AuthContextType } from '../types'; 
+import client from '../service/client';
 
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -10,56 +11,62 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
  useEffect(() => {
-  const savedUser = storage.get<User>('user'); 
-  
-  if (savedUser) {
-    setUser(savedUser); 
+    const savedUser = storage.get<User>('user'); 
+    
+    if (savedUser) {
+      setUser(savedUser); 
+    }
+    setLoading(false);
+  }, []);
+
+  const login = async ({ email, password }: any) => {
+    try {
+      const response = await client.post('/auth/login', { email, password });
+      
+      // Now you get EVERYTHING you need in one response
+      const { token, name, email: userEmail, role } = response.data; 
+
+      const loggedInUser: User = {
+        id: userEmail, 
+        name,
+        email: userEmail,
+        role, // 'ADMIN' or 'CUSTOMER' from Spring Boot
+        token
+      };
+
+      setUser(loggedInUser);
+      storage.set('user', loggedInUser);
+      storage.set('token', token); 
+
+      return true; // Success!
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Login failed");
+    }
   }
-  setLoading(false);
-}, []);
 
-// Inside your AuthProvider
-const login = async ({ username, password }: any) => {
-  const res = await fetch('https://dummyjson.com/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password, expiresInMins: 60 }),
-  });
+  const register = async (formData: any) => {
+    try {
+      const response = await client.post('/auth/register', formData);
+      const data = response.data;
 
-  if (!res.ok) throw new Error("Invalid credentials");
-
-  const data = await res.json();
-  
-  // DummyJSON returns user info + token. 
-  // We manually inject 'ADMIN' role if username is 'emilys' for testing.
-  const userWithRole = { 
-    ...data, 
-    role: data.username === 'emilys' ? 'ADMIN' : 'CUSTOMER' 
+      // If your Spring service returns the token/user upon registration
+      if (data.token) {
+        const loggedInUser: User = {
+          id: data.email,
+          name: data.name,
+          email: data.email,
+          role: data.role || 'CUSTOMER',
+          token: data.token
+        };
+        setUser(loggedInUser);
+        storage.set('user', loggedInUser);
+        storage.set('token', data.token);
+      }
+      return data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Registration failed");
+    }
   };
-  
-  setUser(userWithRole);
-  localStorage.setItem('user', JSON.stringify(userWithRole));
-};
-
-const register = async (formData: any) => {
-  const res = await fetch('https://dummyjson.com/users/add', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      firstName: formData.name.split(' ')[0],
-      lastName: formData.name.split(' ')[1] || '',
-      email: formData.email,
-      password: formData.password,
-    }),
-  });
-
-  if (!res.ok) throw new Error("Registration failed");
-  
-  const data = await res.json();
-  console.log("Mock Registration Successful:", data);
-  return data;
-};
-
 
   const logout = () => {
     setUser(null);

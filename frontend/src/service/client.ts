@@ -1,7 +1,7 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios';
 
 const client = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: '/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,5 +14,18 @@ client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   }
   return config;
 });
+
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login'; // Force login on token expiry
+    }
+    return Promise.reject(error);
+  }
+);
+
 
 export default client;

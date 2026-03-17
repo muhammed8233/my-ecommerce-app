@@ -10,30 +10,35 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchProducts = async () => {
-  setLoading(true);
-  try {
-    // Fetch 20 products from the public API
-    const response = await fetch('https://dummyjson.com/products?limit=20');
-    const data = await response.json();
-    
-    // Map their keys to yours (e.g., title -> name, thumbnail -> imageUrl)
-    const formatted = data.products.map((p: any) => ({
-      id: p.id.toString(),
-      name: p.title,
-      price: p.price,
-      category: p.category,
-      imageUrl: p.thumbnail,
-      stockQuantity: p.stock
-    }));
+   const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/v1/products'); 
+      const data = await response.json();
 
-    setProducts(formatted);
-  } catch (error) {
-    console.error("Failed to fetch products", error);
-  } finally {
-    setLoading(false);
-  }
-};
+      /** 
+       * NOTE: If your backend returns a direct array, use 'data'.
+       * If it wraps it like DummyJSON, use 'data.products'.
+       */
+      const sourceData = Array.isArray(data) ? data : data.products;
+
+      const formatted: Product[] = sourceData.map((p: any) => ({
+        id: p.id.toString(),
+        name: p.string || p.name, // Handles both DummyJSON and standard naming
+        price: p.price,
+        category: p.category,
+        imageUrl: p.string || p.imageUrl,
+        stockQuantity: p.number || p.stockQuantity
+      }));
+
+      setProducts(formatted);
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   useEffect(() => {

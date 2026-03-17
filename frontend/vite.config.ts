@@ -7,4 +7,14 @@ export default defineConfig({
     react(),
     tailwindcss(), 
   ],
+  server: {
+    proxy: {
+      // Forward all /api calls to your backend
+      '/api': {
+        target: 'http://localhost:8080', // Change to 8080 if using Spring Boot
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })
